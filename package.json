@@ -5,10 +5,20 @@
   "type": "module",
   "description": "A regional cultural archive and visitor guide, starting with Bandung and Kanazawa.",
   "scripts": {
-    "dev": "node scripts/server.mjs",
-    "start": "node scripts/server.mjs",
-    "check": "node --check src/app.js && node --check src/data.js && node --check src/photos.js && node --check scripts/server.mjs",
+    "dev": "vite",
+    "start": "vite preview",
+    "build": "vite build",
+    "check": "node --check src/app.js && node --check src/community.js && node --check src/community-api.js && node --check src/community-model.js && node --check src/data.js && node --check src/photos.js && node --check scripts/server.mjs",
     "test": "node --test tests/*.test.mjs"
   },
-  "engines": { "node": ">=22" }
+  "engines": {
+    "node": "22.x"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.117.2"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "vite": "^8.3.1"
+  }
 }

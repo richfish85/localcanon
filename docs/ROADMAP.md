@@ -33,3 +33,12 @@
 - Choose hosting and a remote repository when requested.
 
 Avoid scaling to more regions before the two pilots demonstrate a useful, well-sourced visitor experience.
+
+## 1 October 2026 — Community implementation
+
+- Implemented email-based registration, confirmed-account contributions, private/opt-in public profiles, drafts, submission, feedback, revisions, editorial approval and withdrawal.
+- Supabase schema applied; Vercel hosts the community application. The original GitHub Pages address is retained as a redirect.
+- Source links and media references preserve attribution. File uploads and embeds remain future work.
+- Database tests cover ownership, privacy, role escalation, consent, source requirements, publication, withdrawal and per-contributor limits.
+- Public registration remains a limited pilot until custom email delivery is configured and verified. First editor assignment follows confirmed owner registration.
+- Future improvements: media-upload moderation, paginated collections, contributor translations and operator account-removal tooling.

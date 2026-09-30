@@ -1,0 +1,7 @@
+.git
+.env*
+!.env.example
+.local
+coverage
+node_modules
+docs/references/*.png

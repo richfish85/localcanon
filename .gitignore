@@ -11,3 +11,7 @@ Thumbs.db
 
 # Composite design references remain preserved locally, outside the public release.
 docs/references/*.png
+
+.vercel
+.env*
+!.env.example

@@ -26,3 +26,11 @@ The current model lives in `src/data.js`. Keep the content separate from renderi
 An entry should explain whether it is about a city, a broader cultural region, a country or an explicitly related location. Connect people and organisations to regions with sourced relationships. Do not collapse a craft tradition, individual maker and paid experience into one record.
 
 Use official music links before considering embedded media. Do not copy copyrighted audio or assume that an image search result grants reuse permission. Record sponsorship separately and never let payment act as cultural verification.
+
+## 1 October 2026 — Persisted community records
+
+`profiles` stores display name, bio, preferred region, regional connection, website and optional public visibility. Email and passwords remain in Supabase Auth.
+
+`contributions` stores owner, contribution type, region/theme, title, text, geographic scope, evidence type, source URLs, optional media reference/creator/rights, consent, submission state and private review feedback. Writes go through ownership-checked functions.
+
+`published_contributions` contains only approved publication snapshots with contributor credit. Corrections remain separate attributed notes. Withdrawal removes that snapshot. `private.editors` and `private.review_events` retain operator-assigned editorial membership and an audit trail outside the exposed API schema.

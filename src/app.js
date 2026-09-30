@@ -1,5 +1,6 @@
 import { regions, themes, sources, businessCategories, getEntries, parseRoute } from './data.js';
 import { photos, photoCollections } from './photos.js';
+import { initCommunity, isCommunityRoute, renderCommunity, renderPublished } from './community.js';
 
 const main = document.querySelector('#main');
 const regionSelect = document.querySelector('#region-select');
@@ -26,19 +27,21 @@ function entryCard(entry) {
 }
 
 function render() {
-  const state = parseRoute(location.hash);
+  const state = isCommunityRoute() ? { regionId: regionSelect.value || 'bandung', audience: 'visitor', theme: 'all' } : parseRoute(location.hash);
   const region = regions[state.regionId];
   const hero = photos[photoCollections[state.regionId].hero];
   document.title = `${region.name} · ${title(state.audience)} | LocalCanon`;
   regionSelect.value = region.id;
   audienceNav.innerHTML = ['visitor', 'business'].map(audience => `<a href="${route(state, { audience })}" ${state.audience === audience ? 'aria-current="page"' : ''}>${audience === 'visitor' ? 'Explore' : 'For local businesses'}</a>`).join('');
+  if (isCommunityRoute()) { renderCommunity(); return; }
   main.innerHTML = `<section class="region-intro" aria-labelledby="region-heading">${photoImage(hero, { className: 'hero-photo', eager: true })}<div class="hero-shade" aria-hidden="true"></div><div class="intro-copy"><p class="eyebrow">${region.country} / ${region.area} <span>Pilot region</span></p><h1 id="region-heading">${region.name}</h1><p class="local-name">${region.localName === region.name ? 'People, ideas and everyday culture in motion.' : `${region.localName} · People, ideas and everyday culture in motion.`}</p><p class="introduction">${region.introduction}</p><a class="hero-link" href="${route(state)}" data-explore>Explore ${region.name}</a></div><aside class="intro-aside"><span class="edition">01 / Living archive</span><h2>${state.audience === 'visitor' ? 'A place, through its people.' : 'Be part of the local story.'}</h2><p>${state.audience === 'visitor' ? region.focus : 'Bring your practice, experience or cultural knowledge into a regional guide.'}</p><a href="${region.officialGuide.url}" target="_blank" rel="noopener noreferrer">${region.officialGuide.label}</a></aside></section><div class="hero-caption">${photoCredit(hero)}</div>
     ${state.audience === 'visitor' ? visitorView(state, region) : businessView(region)}
-    <section class="archive-note"><div><p class="eyebrow">Different places. A shared world.</p><h2>A living archive starts with listening.</h2></div><p>This pilot brings sourced introductions together with stories still to be researched. Local voices and cultural context will shape what belongs here.</p></section>`;
+    <section class="archive-note"><div><p class="eyebrow">Different places. A shared world.</p><h2>A living archive starts with listening.</h2></div><div><p>This pilot brings sourced introductions together with stories still to be researched. Local voices and cultural context will shape what belongs here.</p><a class="read-link" href="#contribute">Contribute a story or correction</a></div></section>`;
   document.querySelector('[data-explore]').addEventListener('click', event => { event.preventDefault(); const section = document.querySelector('.themes-section, .business-section'); section.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); section.querySelector('h2').focus({ preventScroll: true }); });
   const sortSelect = document.querySelector('#sort-select');
   if (sortSelect) { sortSelect.value = sort; sortSelect.addEventListener('change', () => { sort = sortSelect.value; render(); document.querySelector('#sort-select').focus({ preventScroll: true }); }); }
   bindFeature(state);
+  renderPublished(state);
 }
 
 function themeNavigation(state) {
@@ -75,7 +78,7 @@ function visitorView(state, region) {
   return `<section class="themes-section" aria-labelledby="theme-heading"><div class="section-heading"><h2 id="theme-heading" tabindex="-1">Explore by theme</h2><span class="small">Follow your curiosity</span></div><nav class="theme-nav" aria-label="Culture themes">${themeNavigation(state)}</nav></section>
     ${state.theme === 'all' ? magazineSpread(state) : ''}
     ${(state.theme === 'all' || state.theme === 'music') ? `<section class="listening" aria-labelledby="listen-heading"><div><p class="eyebrow">The listening room</p><h2 id="listen-heading">Tradition, then the next generation.</h2><p>Hear the region’s roots alongside the people making music today.</p></div><div class="listening-columns"><article><span class="small">01 / Traditional spotlight</span><h3>${region.music.tradition}</h3><p>Performer selection in progress</p></article><article><span class="small">02 / Artist & featured song</span><h3>${region.music.contemporary}</h3><p>Artist and track selection in progress</p></article></div><details><summary>About this collection</summary><p>${region.music.research}</p></details></section>` : ''}
-    <section class="collection" aria-labelledby="collection-heading"><div class="section-heading"><div><p class="eyebrow">${state.theme === 'all' ? 'From the archive' : title(state.theme)}</p><h2 id="collection-heading">Stories & starting points</h2></div><label class="sort-label">Sort by <select id="sort-select"><option value="title">Title</option><option value="year">Year</option><option value="artist">Artist</option><option value="genre">Genre</option></select></label></div><p class="small result-count" role="status">${selected.length} ${selected.length === 1 ? 'entry' : 'entries'} · ${region.name}</p><div class="entries">${selected.length ? selected.map(entryCard).join('') : `<div class="empty"><h3>This chapter is still open.</h3><p>We’re gathering ${title(state.theme).toLowerCase()} stories for ${region.name}. Explore another theme while this collection grows.</p><a href="${route(state, { theme: 'all' })}">View all themes</a></div>`}</div></section>`;
+    <section class="collection" aria-labelledby="collection-heading"><div class="section-heading"><div><p class="eyebrow">${state.theme === 'all' ? 'From the archive' : title(state.theme)}</p><h2 id="collection-heading">Stories & starting points</h2></div><label class="sort-label">Sort by <select id="sort-select"><option value="title">Title</option><option value="year">Year</option><option value="artist">Artist</option><option value="genre">Genre</option></select></label></div><p class="small result-count" role="status">${selected.length} ${selected.length === 1 ? 'entry' : 'entries'} · ${region.name}</p><div class="entries">${selected.length ? selected.map(entryCard).join('') : `<div class="empty"><h3>This chapter is still open.</h3><p>We’re gathering ${title(state.theme).toLowerCase()} stories for ${region.name}. Explore another theme while this collection grows.</p><a href="${route(state, { theme: 'all' })}">View all themes</a></div>`}</div></section><section class="collection" id="community-collection" aria-label="Community contributions"></section>`;
 }
 
 function businessView(region) {
@@ -83,4 +86,5 @@ function businessView(region) {
 }
 
 window.addEventListener('hashchange', () => { featureIndex = 0; render(); });
+initCommunity(render);
 render();

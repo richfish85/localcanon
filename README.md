@@ -6,20 +6,20 @@ This repository translates the available `LocalCanon_discussion` excerpt and its
 
 ## Run locally
 
-Requires Node.js 22 or later. There are no third-party runtime dependencies and no installation step.
+Requires Node.js 22. Install dependencies with `npm ci`. Copy `.env.example` to `.env.local` and fill in the Supabase project URL and publishable key for account features. Without these values, the archive works and the account page reports that registration is not connected.
 
 ```powershell
 npm run dev
 ```
 
-Open http://127.0.0.1:4173. If npm is unavailable, use `node scripts/server.mjs`.
+Open http://127.0.0.1:4173. Vite bundles the browser application; `npm run build` produces `dist` and `npm start` previews that build. The original standalone HTTP server is retained for path-safety regression tests.
 
 ```powershell
 npm run check
 npm test
 ```
 
-To use a different port in PowerShell: `$env:PORT = '4180'`, then run the server. It listens on the local computer only.
+The development server listens on the local computer only. Run `npx vite --port 4180` for another port.
 
 ## Included
 
@@ -34,6 +34,13 @@ To use a different port in PowerShell: `$env:PORT = '4180'`, then run the server
 - A business view introducing proposed directory categories. It does not accept submissions yet.
 - Sourced cultural introductions with expandable context and research placeholders kept visibly distinct.
 - Source integrity, navigation and local-server checks.
+- Email-confirmed registration, sign-in/out, confirmation resend and password recovery through Supabase Auth.
+- Private contributor profiles with optional public visibility.
+- Stories, corrections and suggestions saved as drafts and submitted to an editorial review queue.
+- Source links, geographic scope, first-hand/documented evidence, media references and publication consent.
+- Editor feedback, revision/resubmission, approval and withdrawal. Database rules protect ownership and publication.
+
+See [Contributor setup and validation](docs/COMMUNITY_SETUP.md) for the deployment walkthrough, assumptions and access tests. Public email registration requires a configured SMTP provider; the current launch is labelled as a limited pilot until that is ready.
 
 ## Project map
 
@@ -56,9 +63,11 @@ To use a different port in PowerShell: `$env:PORT = '4180'`, then run the server
 
 The small seed collection contains source-backed introductions, not verified local listings. UNESCO’s angklung record supports an Indonesian cultural description; it does not establish a particular Bandung artist or venue. No fabricated performers, tracks, businesses, events, pricing or opening hours are included.
 
-The six photographs provide a first editorial image collection. Themes without a suitable photograph use typography tiles until accurately attributed imagery is available. The original moodboard and three subsequent layout references are preserved separately. Audio, login, database, payment, booking, business verification and contribution moderation remain future work. See the roadmap before expanding those features.
+The six photographs provide a first editorial image collection. Themes without a suitable photograph use typography tiles until accurately attributed imagery is available. The original moodboard and three subsequent layout references are preserved separately. Accounts, profiles and reviewed text contributions are implemented with Supabase. Audio, media uploads, payment, booking and business verification remain future work. See the roadmap before expanding those features.
 
-Published prototype: https://richfish85.github.io/localcanon/
+Published app: https://localcanon.vercel.app/
+
+Legacy Pages address: https://richfish85.github.io/localcanon/ (redirects to the app after the migration workflow completes).
 
 Source: https://github.com/richfish85/localcanon
 
