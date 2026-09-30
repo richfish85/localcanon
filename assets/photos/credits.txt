@@ -1,0 +1,36 @@
+LOCALCANON PHOTO CREDITS
+Downloaded: 30 September 2026
+License: Unsplash License — https://unsplash.com/license
+JPEG downloads at up to 2400px wide, quality 90.
+The website's film-style presentation is CSS only; these source files are unfiltered.
+
+FILE NAME -> CREDIT
+
+bandung-night.jpg -> Photo by dapiki moto on Unsplash
+Photo: https://unsplash.com/photos/people-sitting-on-chair-near-store-during-night-time-RAL3lZU3j0E
+Subject/location supplied by photographer: Cibadak culinary night, Bandung, Indonesia.
+
+bandung-market.jpg -> Photo by Falaq Lazuardi on Unsplash
+Photo: https://unsplash.com/photos/woman-in-blue-and-red-floral-dress-walking-on-street-during-daytime-9SyG7TQ5PbI
+Subject supplied by photographer: Traditional Marketplace.
+Location evidence: tagged Bandung; the exact market is not identified.
+
+bandung-cafe.jpg -> Photo by Matiinu Ramadhan on Unsplash
+Photo: https://unsplash.com/photos/man-standing-front-desk-inside-room-i3vmGDN_Fzg
+Subject/location supplied by photographer: My Kopi O! cafe, Bandung, Indonesia.
+
+kanazawa-kimono.jpg -> Photo by Ilse Driessen on Unsplash
+Photo: https://unsplash.com/photos/woman-in-red-and-yellow-floral-kimono-standing-on-gray-concrete-floor-during-daytime-iXcfYKVXGOg
+Location supplied by photographer: Higashichaya, Kanazawa, Ishikawa, Japan.
+
+kanazawa-street.jpg -> Photo by Artem Shuba on Unsplash
+Photo: https://unsplash.com/photos/a-person-walking-down-a-street-next-to-tall-buildings-ZuPqwRPhmY8
+Location supplied by photographer: Kanazawa, Ishikawa, Japan.
+
+kanazawa-cooking.jpg -> Photo by Poppy Lin on Unsplash
+Photo: https://unsplash.com/photos/man-in-black-suit-jacket--07R-aXbARI
+Location supplied by photographer: Omicho Fish Market, Kanazawa, Ishikawa, Japan.
+
+All six photo pages were checked on 30 September 2026 and listed their photos as
+free under the Unsplash License. Obtain further evidence before making specific
+claims about the identities, occupations or businesses pictured.
