@@ -1,5 +1,15 @@
 # Contributor accounts and editorial review
 
+## Workspace navigation — 1 October 2026
+
+The account workspace aligns with the header margins. Profiles use two columns on desktop and one on mobile. Short pages place the footer at the bottom of the window; longer pages keep it after the content so it never covers a field.
+
+Contribution editing has four hash-addressed steps: Context, Story, Sources & media, and Review & submit. Back, Next and the numbered links keep the same form mounted, preserving inputs. Browser Back/Forward works between steps. Optional media fields expand on request. Save draft is available throughout; a saved draft still needs a title, at least twenty characters of text and geographic scope, as required by the database.
+
+Unsaved contribution values survive workspace navigation within the signed-in tab. Reloading or closing the tab triggers the browser's unsaved-work warning when available; Save draft is needed for durable storage. Unsaved values are cleared on sign-out. No private draft content is added to browser persistent storage by this interface.
+
+Section headings receive focus on step changes. Hidden panels are excluded from keyboard navigation. Validation opens the relevant step. Short horizontal transitions respect reduced-motion preferences. Registration, sign-in and password-reset fields have labelled Show/Hide controls; passwords begin hidden.
+
 ## Implementation
 
 The existing magazine interface remains plain JavaScript. Vite bundles the Supabase SDK. Supabase Auth handles registration, email confirmation, sign-in, sign-out and password recovery. PostgreSQL stores profiles, private contributions, approved publication snapshots and an editorial audit trail.

@@ -1,4 +1,5 @@
 import { regions, themes } from './data.js';
+import { contributionRoute, mountContributionFlow, steps, stepNames } from './contribution-flow.js';
 import { client, communityApi as api } from './community-api.js';
 import { escapeHtml as e, safeUrl, validateProfile, validateContribution, contributionTypes, statusLabels } from './community-model.js';
 
@@ -9,9 +10,17 @@ let generation = 0;
 let publicGeneration = 0;
 let main;
 let renderArchive;
+let activeFlow;
+const unsavedContributions = new Map();
+const savedNewRoutes = new Map();
+let dirtyContribution = false;
+window.addEventListener('beforeunload', event => { if (dirtyContribution) { event.preventDefault(); event.returnValue = ''; } });
 const regionOptions = selected => Object.values(regions).map(r => `<option value="${r.id}" ${selected === r.id ? 'selected' : ''}>${r.name}</option>`).join('');
 const themeOptions = selected => themes.slice(1).map(t => `<option ${selected === t ? 'selected' : ''} value="${t}">${t.charAt(0).toUpperCase() + t.slice(1)}</option>`).join('');
-const field = (name, label, value = '', extra = '') => `<label>${label}<input name="${name}" value="${e(value)}" ${extra}></label>`;
+const ordinaryField = (name, label, value = '', extra = '') => `<label>${label}<input name="${name}" value="${e(value)}" ${extra}></label>`;
+const field = (name, label, value = '', extra = '') => extra.includes('type="password"')
+  ? `<div class="password-field"><label for="password-${name}">${label}</label><div class="password-control"><input id="password-${name}" name="${name}" value="${e(value)}" ${extra}><button type="button" data-password-toggle="password-${name}" aria-controls="password-${name}" aria-label="Show ${label.toLowerCase()}" aria-pressed="false">Show</button></div></div>`
+  : ordinaryField(name, label, value, extra);
 const textarea = (name, label, value = '', extra = '') => `<label>${label}<textarea name="${name}" ${extra}>${e(value)}</textarea></label>`;
 const message = () => '<p class="form-message" role="status" aria-live="polite"></p>';
 const link = (url, text) => safeUrl(url) ? `<a href="${e(safeUrl(url))}" target="_blank" rel="noopener noreferrer">${e(text)}</a>` : e(text);
@@ -20,10 +29,20 @@ const status = value => `<span class="community-status">${e(statusLabels[value] 
 function shell(title, intro, content) {
   document.title = `${title} | LocalCanon`;
   main.innerHTML = `<section class="community-page"><p class="eyebrow">Local voices / Shared understanding</p><h1>${e(title)}</h1><p class="community-intro">${intro}</p>${session ? `<nav class="workspace-nav" aria-label="Contributor workspace"><a href="#account">My contributions</a><a href="#account/profile">My profile</a><a href="#contribute">New contribution</a>${editor ? '<a href="#review">Review queue</a>' : ''}<button class="quiet-button" data-signout>Sign out</button></nav>` : ''}${content}</section>`;
+  main.querySelectorAll('[data-password-toggle]').forEach(button => button.addEventListener('click', () => {
+    const input = document.getElementById(button.dataset.passwordToggle);
+    const start = input.selectionStart, end = input.selectionEnd;
+    const reveal = input.type === 'password';
+    input.type = reveal ? 'text' : 'password';
+    button.textContent = reveal ? 'Hide' : 'Show';
+    button.setAttribute('aria-pressed', String(reveal));
+    button.setAttribute('aria-label', `${reveal ? 'Hide' : 'Show'} ${input.labels[0].textContent.toLowerCase()}`);
+    input.setSelectionRange(start, end);
+  }));
   main.querySelector('[data-signout]')?.addEventListener('click', async event => {
     const button = event.currentTarget;
     button.disabled = true;
-    try { await api.signOut(); session = null; editor = false; generation++; updateNav(); location.hash = '#account'; await renderCommunity(); } catch { button.disabled = false; button.textContent = 'Sign out failed; retry'; }
+    try { await api.signOut(); session = null; editor = false; unsavedContributions.clear(); savedNewRoutes.clear(); dirtyContribution = false; generation++; updateNav(); location.hash = '#account'; await renderCommunity(); } catch { button.disabled = false; button.textContent = 'Sign out failed; retry'; }
   });
 }
 
@@ -39,7 +58,7 @@ export async function initCommunity(archiveRenderer) {
   if (!api) return;
   client.auth.onAuthStateChange((event, next) => {
     if (event === 'PASSWORD_RECOVERY') recovery = true;
-    session = next; if (!next) editor = false;
+    session = next; if (!next) { editor = false; unsavedContributions.clear(); savedNewRoutes.clear(); dirtyContribution = false; }
     updateNav();
     // Supabase warns against awaiting other auth operations inside this callback.
     if (event !== 'TOKEN_REFRESHED' && event !== 'USER_UPDATED') setTimeout(() => { if (isCommunityRoute()) renderCommunity(); }, 0);
@@ -63,6 +82,7 @@ function bindForm(selector, action) {
     const buttons = [...form.querySelectorAll('button')];
     const submitter = event.submitter?.value;
     buttons.forEach(b => { b.disabled = true; });
+    notice.classList.remove('error');
     notice.textContent = 'Working…';
     try { await action(Object.fromEntries(new FormData(form)), notice, submitter, form); }
     catch (error) { notice.textContent = friendlyError(error); notice.classList.add('error'); }
@@ -115,7 +135,7 @@ function resetView() {
 
 async function profileView(token) {
   const profile = await api.profile(session.user.id); if (token !== generation) return;
-  shell('Your contributor profile', 'Choose how you are credited and describe your connection to a place.', `<form id="profile-form" class="community-form narrow-form">${field('display_name','Display name',profile.display_name,'required minlength="2" maxlength="80" autocomplete="nickname"')}${textarea('bio','Short bio',profile.bio,'maxlength="1000" rows="4"')}<label>Region<select name="region_id"><option value="">No preference</option>${regionOptions(profile.region_id)}</select></label>${textarea('connection','Your connection to the region',profile.connection,'maxlength="300" rows="3"')}${field('website','Website (optional)',profile.website,'type="url" maxlength="2000" placeholder="https://"')}<label class="check-label"><input name="is_public" type="checkbox" ${profile.is_public ? 'checked' : ''}> Make my profile public.</label><p class="small">Public profiles show the fields above. Your email is never shown. Published contributions carry your display name even if your profile stays private.</p><button class="community-button">Save profile</button>${message()}</form>`);
+  shell('Your contributor profile', 'Choose how you are credited and describe your connection to a place.', `<form id="profile-form" class="community-form profile-form"><div class="profile-columns"><section><h2>Identity & biography</h2>${field('display_name','Display name',profile.display_name,'required minlength="2" maxlength="80" autocomplete="nickname"')}${textarea('bio','Short bio',profile.bio,'maxlength="1000" rows="4"')}${field('website','Website (optional)',profile.website,'type="url" maxlength="2000" placeholder="https://"')}</section><section><h2>Connection & visibility</h2><label>Region<select name="region_id"><option value="">No preference</option>${regionOptions(profile.region_id)}</select></label>${textarea('connection','Your connection to the region',profile.connection,'maxlength="300" rows="3"')}<label class="check-label"><input name="is_public" type="checkbox" ${profile.is_public ? 'checked' : ''}> Make my profile public.</label><p class="small">Public profiles show the fields above. Your email is never shown. Published contributions carry your display name even if your profile stays private.</p></section></div><div class="form-actions"><button class="community-button">Save profile</button>${message()}</div></form>`);
   bindForm('#profile-form', async (data, notice) => { await api.saveProfile(session.user.id, validateProfile({ ...data, is_public: data.is_public === 'on' })); notice.textContent = 'Profile saved.'; });
 }
 
@@ -131,17 +151,45 @@ async function dashboard(token) {
 }
 
 async function contributionForm(id, token) {
-  const item = id ? await api.contribution(id) : { region_id: document.querySelector('#region-select').value, kind: 'story', theme: 'people', evidence_kind: 'documented', media_rights: 'link_only' };
+  const ownerId = session.user.id;
+  const cacheKey = `${ownerId}/${id || "new"}`;
+  let item = id ? await api.contribution(id) : { region_id: document.querySelector('#region-select').value, kind: 'story', theme: 'people', evidence_kind: 'documented', media_rights: 'link_only' };
   if (token !== generation) return;
   if (id && (item.owner_id !== session.user.id || !['draft','changes_requested'].includes(item.status))) { shell('Contribution locked', 'Submitted contributions remain unchanged during review.', '<a href="#account">Return to your contributions</a>'); return; }
-  shell(id ? 'Continue your contribution' : 'Share local knowledge', 'Be specific about the place, the people, and what your evidence supports.', `${item.review_note ? `<p class="editor-feedback"><strong>Editor feedback:</strong> ${e(item.review_note)}</p>` : ''}<form id="contribution-form" class="community-form"><div class="form-grid"><label>Contribution type<select name="kind">${Object.entries(contributionTypes).map(([v,label]) => `<option value="${v}" ${item.kind === v ? 'selected' : ''}>${label}</option>`).join('')}</select></label><label>Region<select name="region_id">${regionOptions(item.region_id)}</select></label><label>Theme<select name="theme">${themeOptions(item.theme)}</select></label><label>How do you know?<select name="evidence_kind"><option value="documented" ${item.evidence_kind === 'documented' ? 'selected' : ''}>Documented sources</option><option value="firsthand" ${item.evidence_kind === 'firsthand' ? 'selected' : ''}>First-hand account</option></select></label></div>${field('title','Title',item.title,'required minlength="3" maxlength="160"')}${textarea('body','Your story, correction or suggestion',item.body,'required minlength="20" maxlength="12000" rows="10"')}<p class="small">For a correction, name the entry and explain what should change. Separate observation from interpretation. Do not include private contact details or sensitive personal information.</p>${field('scope','Geographic scope',item.scope,'required minlength="2" maxlength="300" placeholder="For example: a named neighbourhood in Bandung"')}${textarea('source_text','Source links — one per line',(item.sources || []).join('\n'),'rows="4" placeholder="https://…"')}<p class="small">Up to eight links. Documented claims need at least one; first-hand accounts should explain your connection and when the observation was made.</p><fieldset><legend>Media reference (optional)</legend><p class="small">Link to a photograph, song or artwork for review. We do not copy, upload or embed it automatically.</p>${field('media_url','Original media link',item.media_url,'type="url" maxlength="2000"')}${field('media_creator','Creator / credit',item.media_creator,'maxlength="200"')}<label>Rights status<select name="media_rights"><option value="link_only" ${item.media_rights === 'link_only' ? 'selected' : ''}>Reference link only</option><option value="own_work" ${item.media_rights === 'own_work' ? 'selected' : ''}>My own work</option><option value="permission_recorded" ${item.media_rights === 'permission_recorded' ? 'selected' : ''}>Permission recorded — explain in the contribution</option></select></label></fieldset><label class="check-label"><input name="publish_consent" type="checkbox" ${item.publish_consent ? 'checked' : ''}> I permit LocalCanon to publish this contribution with my display-name credit after review, and confirm that I have permission to share it.</label><p class="small">This permission applies to the submitted text; a media link does not grant reuse rights. You can withdraw a contribution through your account. <a href="#privacy">Read the contribution rules</a>.</p><div class="form-actions"><button class="community-button secondary" name="action" value="draft">Save draft</button><button class="community-button" name="action" value="submit">Submit for review</button></div>${message()}</form>`);
+  item = { ...item, ...unsavedContributions.get(cacheKey) };
+  shell(id ? 'Continue your contribution' : 'Share local knowledge', 'Be specific about the place, the people, and what your evidence supports.', `${item.review_note ? `<p class="editor-feedback"><strong>Editor feedback:</strong> ${e(item.review_note)}</p>` : ''}<form id="contribution-form" class="community-form contribution-wizard" novalidate data-key="${id || 'new'}" data-user="${session.user.id}"><nav class="step-nav" aria-label="Contribution steps">${steps.map((step,i) => `<a data-step href="#contribute/${id || 'new'}/${step}"><span>${i + 1}.</span> ${stepNames[i]}</a>`).join('')}</nav><p class="step-progress" data-progress role="status" aria-live="polite"></p><section data-panel="context"><h2 tabindex="-1">Place & context</h2><div class="form-grid"><label>Contribution type<select name="kind">${Object.entries(contributionTypes).map(([v,label]) => `<option value="${v}" ${item.kind === v ? 'selected' : ''}>${label}</option>`).join('')}</select></label><label>Region<select name="region_id">${regionOptions(item.region_id)}</select></label><label>Theme<select name="theme">${themeOptions(item.theme)}</select></label><label>How do you know?<select name="evidence_kind"><option value="documented" ${item.evidence_kind === 'documented' ? 'selected' : ''}>Documented sources</option><option value="firsthand" ${item.evidence_kind === 'firsthand' ? 'selected' : ''}>First-hand account</option></select></label></div>${field('scope','Geographic scope',item.scope,'required minlength="2" maxlength="300" placeholder="For example: a named neighbourhood in Bandung"')}</section><section data-panel="story" hidden><h2 tabindex="-1">Tell your story</h2>${field('title','Title',item.title,'required minlength="3" maxlength="160"')}${textarea('body','Your story, correction or suggestion',item.body,'required minlength="20" maxlength="12000" rows="10"')}<p class="small">For a correction, name the entry and explain what should change. Separate observation from interpretation. Do not include private contact details or sensitive personal information.</p></section><section data-panel="sources" hidden><h2 tabindex="-1">Sources & media</h2><div class="sources-columns"><div>${textarea('source_text','Source links — one per line',(item.sources || []).join('\n'),'rows="4" placeholder="https://…"')}<p class="small">Up to eight links. Documented claims need at least one; first-hand accounts should explain your connection and when the observation was made.</p></div><details class="media-disclosure" ${item.media_url ? 'open' : ''}><summary>Add a media reference (optional)</summary><fieldset><legend>Media credit & rights</legend><p class="small">Link to a photograph, song or artwork for review. We do not copy, upload or embed it automatically.</p>${field('media_url','Original media link',item.media_url,'type="url" maxlength="2000"')}${field('media_creator','Creator / credit',item.media_creator,'maxlength="200"')}<label>Rights status<select name="media_rights"><option value="link_only" ${item.media_rights === 'link_only' ? 'selected' : ''}>Reference link only</option><option value="own_work" ${item.media_rights === 'own_work' ? 'selected' : ''}>My own work</option><option value="permission_recorded" ${item.media_rights === 'permission_recorded' ? 'selected' : ''}>Permission recorded — explain in the contribution</option></select></label></fieldset></details></div></section><section data-panel="review" hidden><h2 tabindex="-1">Review & submit</h2><div data-review-summary></div><label class="check-label"><input name="publish_consent" type="checkbox" ${item.publish_consent ? 'checked' : ''}> I permit LocalCanon to publish this contribution with my display-name credit after review, and confirm that I have permission to share it.</label><p class="small">This permission applies to the submitted text; a media link does not grant reuse rights. You can withdraw a contribution through your account. <a href="#privacy">Read the contribution rules</a>.</p></section><div class="form-actions wizard-actions"><button type="button" class="community-button secondary" data-back>Back</button><button class="community-button secondary" name="action" value="draft">Save draft</button><button type="button" class="community-button" data-next>Next</button><button class="community-button" name="action" value="submit" hidden>Submit for review</button></div>${message()}</form>`);
   let savedId = id;
+  const form = main.querySelector('#contribution-form');
+  const read = () => {
+    const data = Object.fromEntries(new FormData(form));
+    return { ...data, sources: (data.source_text || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean), publish_consent: data.publish_consent === 'on' };
+  };
+  const flow = mountContributionFlow(form, {
+    key: id || 'new',
+    onReview: () => { form.querySelector('[data-review-summary]').innerHTML = contributionDetail(read()); },
+    onChange: () => { unsavedContributions.set(`${ownerId}/${savedId || 'new'}`, read()); dirtyContribution = true; },
+  });
+  activeFlow = flow;
+  flow.show(contributionRoute(location.hash).step, false);
   bindForm('#contribution-form', async (data, notice, action) => {
-    const payload = validateContribution({ ...data, publish_consent: data.publish_consent === 'on' }, action === 'submit');
+    let payload;
+    try { payload = validateContribution({ ...data, publish_consent: data.publish_consent === 'on' }, action === 'submit'); }
+    catch (error) {
+      const target = /title|Write between/.test(error.message) ? 'story' : /scope|region|theme|type/.test(error.message) ? 'context' : /permission/.test(error.message) && data.publish_consent !== 'on' ? 'review' : 'sources';
+      history.replaceState(null, '', flow.address(target)); flow.show(target);
+      throw error;
+    }
     savedId = await api.save(payload, savedId);
-    history.replaceState(null, '', `#contribute/${savedId}`);
+    const previousKey = form.dataset.key;
+    if (previousKey === 'new') savedNewRoutes.set(ownerId, savedId);
+    form.dataset.key = savedId;
+    flow.setKey(savedId);
+    unsavedContributions.delete(`${ownerId}/${previousKey}`);
+    unsavedContributions.delete(`${ownerId}/${savedId}`);
+    dirtyContribution = unsavedContributions.size > 0;
+    if (form.isConnected) history.replaceState(null, '', flow.address(contributionRoute(location.hash).step));
     notice.textContent = 'Draft saved.';
-    if (action === 'submit') { await api.submit(savedId); location.hash = '#account'; }
+    if (action === 'submit') { await api.submit(savedId); if (form.isConnected) location.hash = '#account'; }
   });
 }
 
@@ -163,6 +211,18 @@ function privacyView() {
 export async function renderCommunity() {
   const token = ++generation;
   if (!main) return;
+  if (location.hash.startsWith('#contribute') && session && !recovery) {
+    if (location.hash === '#contribute') savedNewRoutes.delete(session.user.id);
+    if (location.hash.startsWith('#contribute/new/') && savedNewRoutes.has(session.user.id)) {
+      history.replaceState(null, '', `#contribute/${savedNewRoutes.get(session.user.id)}/${contributionRoute(location.hash).step}`);
+    }
+    const route = contributionRoute(location.hash);
+    const mounted = main.querySelector('#contribution-form');
+    if (mounted?.dataset.key === route.key && mounted.dataset.user === session.user.id && activeFlow) {
+      document.title = `Step ${steps.indexOf(route.step) + 1}: ${stepNames[steps.indexOf(route.step)]} | LocalCanon`;
+      activeFlow.show(route.step); return;
+    }
+  }
   const [, route, segment, id] = location.hash.match(/^#([^/]+)(?:\/([^/]+))?(?:\/([^/]+))?/) || [];
   if (route === 'privacy') { privacyView(); return; }
   if (!api) { authView(); return; }
@@ -183,7 +243,7 @@ export async function renderCommunity() {
   try {
     editor = await api.isEditor(); if (token !== generation) return;
     if (route === 'review') await reviewQueue(token);
-    else if (route === 'contribute') await contributionForm(segment, token);
+    else if (route === 'contribute') await contributionForm(contributionRoute(location.hash).id, token);
     else if (segment === 'profile') await profileView(token);
     else if (segment === 'contribution') { const item = await api.contribution(id); if (token === generation) shell(item.title, statusLabels[item.status], contributionDetail(item)); }
     else await dashboard(token);
