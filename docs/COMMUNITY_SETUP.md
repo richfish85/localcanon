@@ -4,6 +4,8 @@
 
 The account workspace aligns with the header margins. Profiles use two columns on desktop and one on mobile. Short pages place the footer at the bottom of the window; longer pages keep it after the content so it never covers a field.
 
+Personal account navigation sits beneath the global navigation in the header. Contribution tabs sit immediately below the page introduction. The active numbered tab supplies visible progress; the separate step announcement is available to screen readers without repeating it on screen.
+
 Contribution editing has four hash-addressed steps: Context, Story, Sources & media, and Review & submit. Back, Next and the numbered links keep the same form mounted, preserving inputs. Browser Back/Forward works between steps. Optional media fields expand on request. Save draft is available throughout; a saved draft still needs a title, at least twenty characters of text and geographic scope, as required by the database.
 
 Unsaved contribution values survive workspace navigation within the signed-in tab. Reloading or closing the tab triggers the browser's unsaved-work warning when available; Save draft is needed for durable storage. Unsaved values are cleared on sign-out. No private draft content is added to browser persistent storage by this interface.
