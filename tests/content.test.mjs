@@ -24,7 +24,7 @@ test('theme selection stays inside the region and handles empty collections', ()
 });
 
 test('unknown routes fall back to Bandung visitor overview', () => {
-  assert.deepEqual(parseRoute('#invalid/admin/invalid'), { regionId: 'bandung', audience: 'visitor', theme: 'all' });
+  assert.deepEqual(parseRoute('#invalid/admin/invalid'), { regionId: 'bandung', audience: 'visitor', theme: 'all', kind: 'all' });
   assert.equal(parseRoute('#kanazawa/business/music').audience, 'business');
 });
 
@@ -49,8 +49,8 @@ test('HTTP server serves app assets and rejects unsupported methods', async () =
   } finally { await new Promise(resolve => server.close(resolve)); }
 });
 
-test('six local photos have credits and stay within their region', async () => {
-  assert.equal(Object.keys(photos).length, 6);
+test('local photos have credits and stay within their region', async () => {
+  assert.equal(Object.keys(photos).length, 7);
   const credits = await readFile(new URL('../assets/photos/credits.txt', import.meta.url), 'utf8');
   for (const photo of Object.values(photos)) {
     assert.ok((await stat(new URL(`../${photo.src}`, import.meta.url))).size > 10000);

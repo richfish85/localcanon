@@ -1,7 +1,11 @@
+import { melbourneRegion, melbourneSources, melbourneEntries } from './melbourne.js';
+
 // Evidence applies to the specific description, not every possible regional association.
-export const themes = ['all', 'people', 'food', 'music', 'dance', 'language', 'fashion', 'beliefs', 'craft', 'events'];
+export const themes = ['all', 'people', 'food', 'music', 'dance', 'language', 'fashion', 'beliefs', 'craft', 'events', 'art', 'places'];
+export const entryKinds = { all: 'Everything', festival: 'Festivals', artist: 'Artists & performers', place: 'Cultural places' };
 
 export const regions = {
+  melbourne: melbourneRegion,
   bandung: {
     id: 'bandung', name: 'Bandung', localName: 'Bandung', country: 'Indonesia', area: 'West Java',
     introduction: 'Begin with the people who make a place: its music, its craft, and the stories carried into everyday life.',
@@ -21,12 +25,14 @@ export const regions = {
 };
 
 export const sources = {
+  ...melbourneSources,
   'unesco-angklung': { id: 'unesco-angklung', title: 'Indonesian Angklung', publisher: 'UNESCO Intangible Cultural Heritage', url: 'https://ich.unesco.org/en/RL/indonesian-angklung-00393', accessed: '2026-09-30' },
   'kanazawa-yuzen': { id: 'kanazawa-yuzen', title: 'Kanazawa’s Kaga Yuzen: hand-painted kimono silks to dye for', publisher: 'Visit Kanazawa', url: 'https://visitkanazawa.jp/en/feature/detail_381.html', accessed: '2026-09-30' },
   'kanazawa-crafts': { id: 'kanazawa-crafts', title: 'Traditional Craft of Kanazawa', publisher: 'Visit Kanazawa', url: 'https://visitkanazawa.jp/en/crafts', accessed: '2026-09-30' }
 };
 
 export const entries = [
+  ...melbourneEntries,
   { id: 'angklung', regionId: 'bandung', theme: 'music', title: 'Angklung: a shared sound',
     description: 'Bamboo tubes in a frame create the sound of this Indonesian musical instrument. UNESCO records its place in community customs and cultural identity.',
     scope: 'Indonesia. Bandung performer and venue research is still needed.', status: 'sourced',
@@ -56,8 +62,8 @@ export const entries = [
 
 export const businessCategories = ['Artisans & makers', 'Performers & artists', 'Food & hospitality', 'Guides & experiences', 'Cultural organisations'];
 
-export function getEntries(regionId, theme = 'all', sort = 'title') {
-  const result = entries.filter(entry => entry.regionId === regionId && (theme === 'all' || entry.theme === theme));
+export function getEntries(regionId, theme = 'all', sort = 'title', kind = 'all') {
+  const result = entries.filter(entry => entry.regionId === regionId && (theme === 'all' || entry.theme === theme) && (kind === 'all' || entry.kind === kind));
   const key = ['title', 'artist', 'year', 'genre'].includes(sort) ? sort : 'title';
   return result.sort((a, b) => {
     const av = a[key], bv = b[key];
@@ -69,6 +75,21 @@ export function getEntries(regionId, theme = 'all', sort = 'title') {
 }
 
 export function parseRoute(hash = '') {
-  const [region, audience, theme] = hash.replace(/^#/, '').split('/');
-  return { regionId: Object.hasOwn(regions, region) ? region : 'bandung', audience: audience === 'business' ? 'business' : 'visitor', theme: themes.includes(theme) ? theme : 'all' };
+  const [region, audience, theme, kind] = hash.replace(/^#/, '').split('/');
+  return { regionId: Object.hasOwn(regions, region) ? region : 'bandung', audience: audience === 'business' ? 'business' : 'visitor', theme: themes.includes(theme) ? theme : 'all', kind: region === 'melbourne' && Object.hasOwn(entryKinds, kind) ? kind : 'all' };
+}
+
+export function melbourneToday(now = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-AU', { timeZone: 'Australia/Melbourne', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(now);
+  const part = type => parts.find(value => value.type === type).value;
+  return `${part('year')}-${part('month')}-${part('day')}`;
+}
+
+export function eventState(entry, today = melbourneToday()) {
+  if (!entry.event) return null;
+  if (entry.event.end < today) return { key: 'past', label: 'Past edition' };
+  // Future dates stay useful as an archive, but are not live availability guarantees.
+  const age = (Date.parse(`${today}T00:00:00Z`) - Date.parse(`${entry.checked}T00:00:00Z`)) / 86400000;
+  if (!Number.isFinite(age) || age > 45) return { key: 'recheck', label: 'Dates need rechecking' };
+  return entry.event.start > today ? { key: 'upcoming', label: 'Scheduled edition' } : { key: 'current', label: 'Within published dates' };
 }

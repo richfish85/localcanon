@@ -101,6 +101,30 @@ details p, details li { font-size: .875rem; }
 .entries { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 3rem; }
 .entry-card { padding: 1.6rem 0 2rem; border-top: 1px solid var(--line); min-width: 0; }
 .entry-card > p { max-width: 560px; }
+.entry-location { color:var(--muted); font-size:.875rem; margin-top:-.25rem; }
+.event-dates { margin:1rem 0; }
+.event-dates p { margin:.35rem 0 .1rem; font-weight:600; color:var(--navy); }
+.event-dates small { font-size:.8rem; color:var(--muted); }
+.event-state { font-size:.8rem; font-weight:600; color:var(--navy); }
+.event-state.past,.event-state.recheck { color:var(--muted); }
+.collection-nav { display:flex; flex-wrap:wrap; gap:.6rem; margin:.5rem 0 1.2rem; }
+.collection-nav a { display:flex; align-items:center; gap:.65rem; min-height:44px; padding:.6rem .9rem; border:1px solid var(--line); color:var(--navy); text-decoration:none; }
+.collection-nav a[aria-current],.collection-nav a:hover { color:white; background:var(--navy); border-color:var(--navy); }
+.collection-nav span { font-size:.8rem; }
+.regional-notebook { margin:0 5% 2.8rem; display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:clamp(2rem,5vw,5rem); align-items:start; }
+.notebook-intro { padding:1.5rem 0; }
+.notebook-intro h2 { max-width:19ch; font-size:clamp(2rem,3.5vw,3.2rem); }
+.notebook-intro > p { max-width:62ch; }
+.notebook-intro > .small { margin-top:2rem; }
+.festival-notebook { background:var(--blue-tint); padding:1.5rem 2rem; }
+.festival-notebook h2 { font-size:1.65rem; }
+.festival-notebook ul { list-style:none; margin:0 0 1.3rem; padding:0; }
+.festival-notebook li { padding:.9rem 0; }
+.festival-notebook h3 { font:600 1rem 'Segoe UI',sans-serif; margin:0; }
+.festival-notebook .event-dates { margin:.35rem 0 0; }
+.festival-notebook .event-dates p { font-size:.875rem; font-weight:400; }
+.festival-notebook > .small { margin-bottom:0; }
+@media(max-width:760px) { .regional-notebook { grid-template-columns:1fr; gap:1rem; } .notebook-intro { padding:.5rem 0; } .festival-notebook { padding:1.3rem; } }
 .card-meta { display: flex; gap: .5rem; justify-content: space-between; align-items: center; font-size: .875rem; }
 .card-meta > span:first-child { text-transform: uppercase; letter-spacing: .08em; }
 .status { color: var(--navy); padding: .1rem .6rem; background: var(--blue-tint); }

@@ -34,3 +34,9 @@ Use official music links before considering embedded media. Do not copy copyrigh
 `contributions` stores owner, contribution type, region/theme, title, text, geographic scope, evidence type, source URLs, optional media reference/creator/rights, consent, submission state and private review feedback. Writes go through ownership-checked functions.
 
 `published_contributions` contains only approved publication snapshots with contributor credit. Corrections remain separate attributed notes. Withdrawal removes that snapshot. `private.editors` and `private.review_events` retain operator-assigned editorial membership and an audit trail outside the exposed API schema.
+
+## 11 October 2026 — Melbourne editorial seed
+
+`src/melbourne.js` supplies region metadata, source records and 22 entries merged by `src/data.js`. Entries add `kind` (festival, artist, place), location, official website, checked date and optional event `{start,end,edition,timezone}`. Dates are inclusive Melbourne local dates. Display labels distinguish past editions, dates within the published range, future published dates and sources needing recheck after 45 days; these are not live availability or cancellation checks. Artist relationships retain geographic caveats. Collection kind and cultural theme are independent filters.
+
+Melbourne's acknowledgement describes the City of Melbourne's published Traditional Owner context. It is not a boundary map or a template naming the same peoples for all Victoria. Match future Australian region acknowledgements to local authoritative guidance. Community contributions continue to use the existing moderated records; kind filtering currently describes the editorial seed collection only.

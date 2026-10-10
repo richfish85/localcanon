@@ -19,6 +19,7 @@ test('database enforces private ownership, verified accounts and editorial publi
   try {
     await db.exec(`create role anon; create role authenticated; create schema auth; create table auth.users(id uuid primary key, email_confirmed_at timestamptz, raw_user_meta_data jsonb default '{}'); create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub', true),'')::uuid; $$; grant usage on schema public, auth to anon, authenticated; grant execute on function auth.uid() to anon, authenticated;`);
     await db.exec(await readFile(new URL('../supabase/migrations/202610010001_community.sql',import.meta.url),'utf8'));
+    await db.exec(await readFile(new URL('../supabase/migrations/202610110001_melbourne.sql',import.meta.url),'utf8'));
     await db.query(`insert into auth.users(id,email_confirmed_at,raw_user_meta_data) values ($1,now(),'{"display_name":"Synthetic author"}'),($2,now(),'{"display_name":"Synthetic stranger"}'),($3,now(),'{"display_name":"Synthetic editor"}'),($4,null,'{}')`,[author,stranger,editor,unverified]);
     await db.query('insert into private.editors(user_id) values($1)',[editor]);
     assert.equal((await as(null,'select * from public.profiles')).rows.length,0);
@@ -71,5 +72,14 @@ test('database enforces private ownership, verified accounts and editorial publi
     const selfId=(await as(editor,'select public.save_contribution($1::jsonb)',[JSON.stringify(draft)])).rows[0].save_contribution;
     await as(editor,'select public.submit_contribution($1)',[selfId]);
     await assert.rejects(as(editor,"select public.review_contribution($1,'approved','')",[selfId]),/another editor/);
+    await as(author,'update public.profiles set region_id=$1 where id=$2',['melbourne',author]);
+    for (const theme of ['art','places']) {
+      const melbourneId = (await as(author,'select public.save_contribution($1::jsonb)',[JSON.stringify({...draft,region_id:'melbourne',theme})])).rows[0].save_contribution;
+      await as(author,'select public.submit_contribution($1)',[melbourneId]);
+      await as(editor,"select public.review_contribution($1,'approved','Synthetic migration test.')",[melbourneId]);
+    }
+    assert.equal((await as(null,"select * from public.published_contributions where region_id='melbourne'")).rows.length,2);
+    await assert.rejects(as(author,'select public.save_contribution($1::jsonb)',[JSON.stringify({...draft,region_id:'unknown'})]),/check constraint/);
+    await assert.rejects(as(author,'select public.save_contribution($1::jsonb)',[JSON.stringify({...draft,theme:'unknown'})]),/check constraint/);
   } finally { await db.close(); }
 });

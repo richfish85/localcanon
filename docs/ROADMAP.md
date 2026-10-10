@@ -42,3 +42,10 @@ Avoid scaling to more regions before the two pilots demonstrate a useful, well-s
 - Database tests cover ownership, privacy, role escalation, consent, source requirements, publication, withdrawal and per-contributor limits.
 - Public registration remains a limited pilot until custom email delivery is configured and verified. First editor assignment follows confirmed owner registration.
 - Future improvements: media-upload moderation, paginated collections, contributor translations and operator account-removal tooling.
+
+## 11 October 2026 implementation update
+
+- Implemented Melbourne editorial notebook, 22 sourced entries and festival/artist/place collection filters.
+- Added region-specific Acknowledgement of Country on Melbourne views.
+- Added a compatible database migration for Melbourne contributions; retained moderation and access controls.
+- Next: three assisted contributor sessions, source/date maintenance, and separate evidence for payment demand. See docs/MELBOURNE_PILOT.md.

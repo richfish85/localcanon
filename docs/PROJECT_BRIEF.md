@@ -41,3 +41,7 @@ LocalCanon is a cultural archive that can help a visitor understand and explore 
 | Contributor / editor | Add local knowledge and correct misrepresentation | Future contribution and review workflow |
 
 No claim is made that this first prototype supports booking, transactions, real-time tourism information or a complete local directory.
+
+### 11 October 2026: Melbourne manual collection
+
+Melbourne is now the third regional view, with a manually sourced collection of eight festivals, six artists and performers, and eight cultural places. Festival records retain edition dates, Melbourne time zone, source checks and past-edition labels. Country acknowledgement is visible on both Melbourne audience views. Contributor permissions remain unchanged; the accompanying database migration permits Melbourne and the art/places themes. Assisted onboarding options are in docs/MELBOURNE_PILOT.md; they are proposals, not validated demand.

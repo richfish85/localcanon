@@ -38,7 +38,7 @@ flowchart LR
 ## Setup walkthrough
 
 1. Create a Supabase project with Data API enabled and automatic table exposure disabled. Keep `private` outside the exposed schemas.
-2. Run `supabase/migrations/202610010001_community.sql` once in the SQL Editor. It runs transactionally.
+2. Run `supabase/migrations/202610010001_community.sql` once in the SQL Editor, followed by `supabase/migrations/202610110001_melbourne.sql`. Both run transactionally. An existing installation needs only the second migration to accept Melbourne profiles and contributions, plus the art and places themes.
 3. Configure Auth: email confirmation enabled, minimum password length 12, site URL set to the production LocalCanon URL. Add that URL and the local development origin as allowed redirects. Configure a production email provider; the default mail service can restrict recipients and throughput.
 4. Copy the project URL and **publishable** key to `.env.local` using `.env.example`. Never use a secret or service-role key in a `VITE_` variable.
 5. Install dependencies with `npm ci`; run `npm run dev`. Run `npm run check`, `npm test`, and `npm run build` before release.
