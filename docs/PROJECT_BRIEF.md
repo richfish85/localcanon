@@ -45,3 +45,9 @@ No claim is made that this first prototype supports booking, transactions, real-
 ### 11 October 2026: Melbourne manual collection
 
 Melbourne is now the third regional view, with a manually sourced collection of eight festivals, six artists and performers, and eight cultural places. Festival records retain edition dates, Melbourne time zone, source checks and past-edition labels. Country acknowledgement is visible on both Melbourne audience views. Contributor permissions remain unchanged; the accompanying database migration permits Melbourne and the art/places themes. Assisted onboarding options are in docs/MELBOURNE_PILOT.md; they are proposals, not validated demand.
+
+## 11 October 2026 — Find Melbourne Conversation
+
+Richard describes LocalCanon as a preservation and retrieval framework centred on local cultural identity, helping people connect with local history. People can develop its uses within the framework without destructive participation. Preserve attributed disagreement and corrections rather than promise final rulings on cultural origins.
+
+Community-rating filters and approval-order navigation are proposed ways to compare claims; neither popularity nor editorial approval establishes truth or current availability. Future business tags should lead readers to a relevant page and direct contact route so they can check information themselves. Begin with durable tourist-centre and government information; build towards near-real-time interaction gradually. Business tagging, public discussion sorting and real-time services are not implemented. See README for the full consolidated direction and source boundary.

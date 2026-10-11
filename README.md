@@ -1,8 +1,8 @@
 # LocalCanon
 
-A living cultural archive connecting places, people, practices and their sources, with a visitor guide and a future local business layer. The regional pages cover **Melbourne, Australia**, **Bandung, Indonesia** and **Kanazawa, Japan**. Melbourne / Victoria is the starting point for the commercial validation pilot.
+A preservation and retrieval framework centred on local cultural identity: a living archive connecting places, people, practices and their sources, with a visitor guide and a future local business layer. The regional pages cover **Melbourne, Australia**, **Bandung, Indonesia** and **Kanazawa, Japan**. Melbourne / Victoria is the starting point for the commercial validation pilot.
 
-This repository translates the available `LocalCanon_discussion` excerpt and its saved moodboard into a runnable local foundation. The product direction below also consolidates Richard's messages in **LocalCanon Discussion 10 Oct 26**. It is an initial prototype, not a complete archive or booking service.
+This repository translates the available `LocalCanon_discussion` excerpt and its saved moodboard into a runnable local foundation. The product direction below also consolidates Richard's messages in **LocalCanon Discussion 10 Oct 26** and **Find Melbourne Conversation**. It is an initial prototype, not a complete archive or booking service.
 
 ## Product direction — consolidated 11 October 2026
 
@@ -49,6 +49,18 @@ Richard selected **Melbourne / Victoria** as the first commercial validation loc
 Those details are still open in the accessible source messages. Validate a concrete customer's research or curation need before expanding the dashboard or treating the tier proposals as a commercial offer. Bandung and Kanazawa remain the current archive demonstrations; the manually researched Melbourne records are now implemented (see below); no customer results are claimed.
 
 **Source boundary:** all five user messages in the named discussion were available to review. Its assistant replies were returned only as content-reference markers, so recommendations contained in those replies could not be verified. Earlier brief and roadmap sections retain historical scope; this dated section records the later product direction.
+
+## Framework and staged participation — Find Melbourne Conversation
+
+The archive should help people connect with local history and understand local identity. Communities can take it in different directions within the framework, provided participation is not destructive. LocalCanon need not adjudicate every circular cultural-origin dispute; it should preserve attributed perspectives, sources and corrections so people can examine them.
+
+Disagreement can prompt corrections and make practical information more useful. Richard's example was a visitor comparing advice about obtaining a SIM card in Cianjur. Proposed discussion filters include community rating and the order in which entries were editorially approved. These are separate navigation signals: ratings do not prove accuracy, approval is not official recognition, and a newer approval does not establish that information is still current. Cianjur is an illustrative use case, not an implemented region or researched service recommendation.
+
+The intended business connection is a tag linking a contribution to the relevant business page, so readers can visit it and contact the business themselves to check a claim. A mention, a business response and an independently supported fact should remain distinguishable. Tags, business pages and contact workflows are planned; the current collection already provides external organiser, artist and venue links.
+
+Build towards near-real-time interaction rather than promise it at launch. Begin with relatively durable information from tourist information centres, government sites and other authoritative local sources, recording geographic scope and checked dates. Add discussion navigation and business connections later, with source freshness and moderation rules in place. Time-sensitive details such as event dates still need regular review.
+
+**Source boundary:** all five user messages in **Find Melbourne Conversation** were readable. Assistant replies were returned only as content-reference markers. This section captures Richard's stated direction; it does not adopt unseen recommendations or claim that the proposed features have shipped.
 
 ## Melbourne manual collection — 11 October 2026
 

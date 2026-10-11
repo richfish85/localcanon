@@ -96,3 +96,9 @@ Sources:
 - https://www.reconciliation.org.au/reconciliation/acknowledgement-of-country-and-welcome-to-country/
 - https://www.firstpeoplesrelations.vic.gov.au/acknowledgement-traditional-owners
 - https://participate.melbourne.vic.gov.au/reconciliation-2024-2027/story/1110/526
+
+## Find Melbourne Conversation — additional pilot direction
+
+Begin the next research pass with relatively durable tourist information-centre, government and local institutional material. Record what each source supports, its geographic scope and when it was checked. Prioritise gaps in local history and identity rather than expanding the festival calendar alone; date-sensitive records still need regular review.
+
+The assisted sessions can also ask whether participants can find a source, compare conflicting accounts and follow an existing venue/organiser link to check a claim. Business tagging, public ratings, approval-order filters and more immediate interaction are later proposals, not promises in an invitation. This staged direction complements the three-session onboarding test; it does not require the proposed graph or paid dashboard first.

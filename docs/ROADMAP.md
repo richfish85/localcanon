@@ -49,3 +49,14 @@ Avoid scaling to more regions before the two pilots demonstrate a useful, well-s
 - Added region-specific Acknowledgement of Country on Melbourne views.
 - Added a compatible database migration for Melbourne contributions; retained moderation and access controls.
 - Next: three assisted contributor sessions, source/date maintenance, and separate evidence for payment demand. See docs/MELBOURNE_PILOT.md.
+
+## 11 October 2026 — Staged framework direction
+
+Source: Richard's five readable messages in Find Melbourne Conversation. Assistant replies were unavailable as text.
+
+1. Maintain the sourced archive and collect relatively durable tourist-centre, government and local institutional information, with scope and checked dates. Continue manual source maintenance and assisted contributions.
+2. Design attributed public disagreements and correction history; define community-rating and editorial-approval-order filters separately. Decide ascending/descending defaults, freshness signals and moderation before implementation.
+3. Add contribution-to-business relationships and relevant business pages/contact routes. Distinguish mentions, claimed profiles, business replies and source-supported facts; define identity matching, duplicate handling and commercial disclosure.
+4. Evaluate more immediate interaction only when the preceding information, moderation and maintenance processes work. No near-real-time service promise at launch.
+
+Cianjur SIM-card advice illustrates retrieval across differing accounts; it does not add Cianjur to implementation scope. These stages are product direction, not a commitment to a delivery date or a reason to defer the existing small contributor pilot.
